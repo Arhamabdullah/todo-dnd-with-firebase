@@ -136,13 +136,13 @@ const Home: NextPage = () => {
         </Head>
         <header className="flex justify-between items-center px-4 py-2">
           <div className="flex items-center">
-            <Image src= website logo.png alt="Left Logo" width={50} height={50} /> {/* Adjust width and height as needed */}
+            <Image src="website logo.png" alt="Left Logo" width={50} height={50} /> {/* Adjust width and height as needed */}
       <h2 className="ml-2 text-4xl font-bold">To-do</h2>
 
             {/* ... header content */}
           </div>
           <div>
-      <Image src=O_LOGO.png alt="Right Logo" width={50} height={50} /> {/* Adjust width and height as needed */}
+      <Image src="O_LOGO.png" alt="Right Logo" width={50} height={50} /> {/* Adjust width and height as needed */}
     </div>
 
         </header>
@@ -172,10 +172,10 @@ const Home: NextPage = () => {
   )
 }
 
-Home.getInitialProps = async ({ }) => {
+Home.getInitialProps = async () => {
   console.log('req, ')
   return {}
 }
-}
+
 
 export default Home
