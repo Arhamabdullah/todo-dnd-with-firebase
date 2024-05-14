@@ -149,7 +149,7 @@ const Home: NextPage = () => {
         <div className="flex flex-col items-center min-h-screen pt-10">
 
           {/* Input field for adding new todo */}
-          <input
+          <InputField
             value={name} // Current value of the "name" state variable
             onChange={(e) => {setName(e.target.value)}} // Updates "name" state on input change
             onSubmit={addNewTodo} // Triggers submission logic in "addNewTodo" function (if defined in InputField)
@@ -175,6 +175,7 @@ const Home: NextPage = () => {
 Home.getInitialProps = async ({ }) => {
   console.log('req, ')
   return {}
+}
 }
 
 export default Home
