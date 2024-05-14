@@ -11,13 +11,14 @@ import { setDoc, doc, addDoc, collection, deleteDoc, query, onSnapshot, QuerySna
 import { db } from '../backend/firebase'
 
 const Home: NextPage = () => {
-  const [name, setName] = useState<string>('')
-  // Corrected line with semicolon
-  const [view, setView] = useState<TodosView>(TodosView.KanbanView);
-  const [backlogTodos, setBacklogTodos] = useState<Todo[]>([])
-  const [activeTodos, setActiveTodos] = useState<Todo[]>([])
-  const [completedTodos, setCompletedTodos] = useState<Todo[]>([])
+  // State variables for todo management
+  const [name, setName] = useState<string>(''); // Name of the new todo
+  const [view, setView] = useState<TodosView>(TodosView.KanbanView); // Current view (Kanban or List)
+  const [backlogTodos, setBacklogTodos] = useState<Todo[]>([]); // Backlog todos
+  const [activeTodos, setActiveTodos] = useState<Todo[]>([]); // Active todos
+  const [completedTodos, setCompletedTodos] = useState<Todo[]>([]); // Completed todos
 
+  // Fetches todos from local storage on component mount
   useEffect(() => {
     let backlogTodos = window.localStorage.getItem('backlogTodos')
     if (backlogTodos) {
@@ -36,6 +37,7 @@ const Home: NextPage = () => {
     }
   }, [])
 
+  // Handles adding a new todo
   const addNewTodo = async (e: React.FormEvent) => {
     e.preventDefault()
     if (name) {
@@ -60,10 +62,11 @@ const Home: NextPage = () => {
     }
   }
 
+  // Fetches todos from Firestore in real-time
   useEffect(() => {
     const q = query(collection(db, 'todos'))
     const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
-      let todosArr: any = []
+      let todosArr: Todo[] = []
       QuerySnapshot.forEach((doc) => {
         todosArr.push({ ...doc.data(), id: doc.id })
       });
@@ -72,6 +75,7 @@ const Home: NextPage = () => {
     return () => unsubscribe()
   }, [])
 
+  // Handles drag and drop functionality for todos
   const onDragEndHandler = (result: DropResult) => {
     const { destination, source } = result
 
@@ -79,9 +83,9 @@ const Home: NextPage = () => {
       && destination.index === source.index)) return
 
     let add,
-      backlog = backlogTodos,
-      active = activeTodos,
-      complete = completedTodos
+      backlog = backlogTodos.slice(), // Create copies to avoid mutation
+      active = activeTodos.slice(),
+      complete = completedTodos.slice()
     switch (source.droppableId) {
       case TodosStatus.BacklogTodos:
         add = backlogTodos[source.index]
@@ -99,16 +103,15 @@ const Home: NextPage = () => {
 
     if (add) {
       switch (destination.droppableId) {
-        case TodosStatus.BacklogTodos:
-          backlog.splice(destination.index, 0, add)
-          break
-        case TodosStatus.ActiveTodos:
-          active.splice(destination.index, 0, add)
-          break
-        case TodosStatus.CompletedTodos:
-          complete.splice(destination.index, 0, add)
-          break
-      }
+      case TodosStatus.BacklogTodos:
+      backlog.splice(destination.index, 0, add)
+      break
+    case TodosStatus.ActiveTodos:
+      active.splice(destination.index, 0, add)
+      break
+    case TodosStatus.CompletedTodos:
+      complete.splice(destination.index, 0, add)
+      break
     }
 
     setBacklogTodos(backlog)
@@ -122,7 +125,8 @@ const Home: NextPage = () => {
     }
   }
 
- return (
+  // Renders the UI components
+  return (
     <DragDropContext onDragEnd={onDragEndHandler}>
       <div className={styles.container}>
         <Head>
@@ -132,17 +136,26 @@ const Home: NextPage = () => {
         </Head>
         <header className="flex justify-between items-center px-4 py-2">
           <div className="flex items-center">
+            <Image src= website logo.png alt="Left Logo" width={50} height={50} /> {/* Adjust width and height as needed */}
+      <h2 className="ml-2 text-4xl font-bold">To-do</h2>
+
             {/* ... header content */}
           </div>
-          {/* ... header content */}
+          <div>
+      <Image src=O_LOGO.png alt="Right Logo" width={50} height={50} /> {/* Adjust width and height as needed */}
+    </div>
+
         </header>
         <div className="flex flex-col items-center min-h-screen pt-10">
-<InputField
-  value={name} // Matches the expected "value" prop
-  onChange={(e) => setName(e.target.value)} // Matches the expected "onChange" prop
-  onSubmit={addNewTodo} // Matches the optional "onSubmit" prop (if defined in InputField)
-  placeholder="Add a new todo" // Matches the optional "placeholder" prop (if defined in InputField)
-/>
+
+          {/* Input field for adding new todo */}
+          <InputField
+            value={name} // Current value of the "name" state variable
+            onChange={(e) => setName(e.target.value)} // Updates "name" state on input change
+            onSubmit={addNewTodo} // Triggers submission logic in "addNewTodo" function (if defined in InputField)
+            placeholder="Add a new todo" // Placeholder text for the input field
+          />
+
           {/* You can add more content here */}
         </div>
         <Todos
