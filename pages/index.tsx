@@ -141,11 +141,11 @@ const Home: NextPage = () => {
         </Head>
         <header className="flex justify-between items-center px-4 py-2">
           <div className="flex items-center">
-            <Image src={leftLogo} alt="Left Logo" width={50} height={50} />
+            <Image src='../public/website_logo.png' alt="Left Logo" width={50} height={50} />
             <h2 className="ml-2 text-4xl font-bold">To-do</h2>
           </div>
           <div>
-            <Image src={rightLogo} alt="Right Logo" width={50} height={50} />
+            <Image src='../public/O_LOGO.png' alt="Right Logo" width={50} height={50} />
           </div>
         </header>
         <div className="flex flex-col items-center min-h-screen pt-10">
