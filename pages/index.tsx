@@ -150,9 +150,9 @@ const Home: NextPage = () => {
 
           {/* Input field for adding new todo */}
           <InputField
-            value={'name'} // Current value of the "name" state variable
+            value='name' // Current value of the "name" state variable
             onChange={(e) => setName(e.target.value)} // Updates "name" state on input change
-            onSubmit={addNewTodo} // Triggers submission logic in "addNewTodo" function (if defined in InputField)
+            onSubmit='addNewTodo' // Triggers submission logic in "addNewTodo" function (if defined in InputField)
             placeholder="Add a new todo" // Placeholder text for the input field
           />
 
