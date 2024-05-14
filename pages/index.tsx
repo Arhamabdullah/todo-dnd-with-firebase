@@ -1,6 +1,8 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
+import image from 'O_LOGO.png'
+import image from 'website_logo.png'
 import { useEffect, useState } from 'react'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import InputField from '../components/inputfield'
