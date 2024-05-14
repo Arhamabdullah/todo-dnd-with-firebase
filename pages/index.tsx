@@ -136,7 +136,7 @@ const Home: NextPage = () => {
         </Head>
         <header className="flex justify-between items-center px-4 py-2">
           <div className="flex items-center">
-            <Image src={} alt="Left Logo" width={50} height={50} /> {/* Adjust width and height as needed */}
+{/*             <Image src={} alt="Left Logo" width={50} height={50} /> {/* Adjust width and height as needed */} */}
       <h2 className="ml-2 text-4xl font-bold">To-do</h2>
 
             {/* ... header content */}
