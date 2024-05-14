@@ -171,11 +171,12 @@ const Home: NextPage = () => {
     </DragDropContext>
   )
 }
-
+}
 Home.getInitialProps = async () => {
   console.log('req, ')
   return {}
 }
+
 
 
 export default Home
