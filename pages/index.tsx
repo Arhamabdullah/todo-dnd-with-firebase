@@ -137,12 +137,12 @@ const Home: NextPage = () => {
           {/* ... header content */}
         </header>
         <div className="flex flex-col items-center min-h-screen pt-10">
-           <InputField
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onSubmit={addNewTodo}
-            placeholder="Add a new todo"
-          /> 
+<InputField
+  value={name} // Matches the expected "value" prop
+  onChange={(e) => setName(e.target.value)} // Matches the expected "onChange" prop
+  onSubmit={addNewTodo} // Matches the optional "onSubmit" prop (if defined in InputField)
+  placeholder="Add a new todo" // Matches the optional "placeholder" prop (if defined in InputField)
+/>
           {/* You can add more content here */}
         </div>
         <Todos
