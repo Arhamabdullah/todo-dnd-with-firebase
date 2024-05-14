@@ -24,7 +24,7 @@ const Home: NextPage = () => {
         snapshot.forEach((doc) => {
           const todoData = doc.data();
           const todo: Todo = {
-            id: doc.id,
+            name: doc.id,
             todoname: todoData.todoname, // Adjust property names based on your Firestore document structure
             status: todoData.status,
             isDone: todoData.isDone,
