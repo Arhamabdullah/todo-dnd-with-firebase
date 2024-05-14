@@ -137,12 +137,12 @@ const Home: NextPage = () => {
           {/* ... header content */}
         </header>
         <div className="flex flex-col items-center min-h-screen pt-10">
-{/*           <InputField
+           <InputField
             value={name}
             onChange={(e) => setName(e.target.value)}
             onSubmit={addNewTodo}
             placeholder="Add a new todo"
-          /> */}
+          /> 
           {/* You can add more content here */}
         </div>
         <Todos
