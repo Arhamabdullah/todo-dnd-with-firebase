@@ -23,7 +23,7 @@ const Home: NextPage = () => {
       const unsubscribe = onSnapshot(q, (snapshot: QuerySnapshot) => {
         const todosArr: Todo[] = [];
         snapshot.forEach((doc) => {
-          const todoData = doc.data() as Todo;
+          const todoData = doc.data() as Todo; // Ensure that 'Todo' type matches the structure of your Firestore document
           todosArr.push({ ...todoData, id: doc.id });
         });
         setBacklogTodos(todosArr);
@@ -76,7 +76,7 @@ const Home: NextPage = () => {
         moveTodo(TodosStatus.CompletedTodos, destination.droppableId as TodosStatus);
         break;
     }
-  };
+};
 
   return (
     <DragDropContext onDragEnd={onDragEndHandler}>
