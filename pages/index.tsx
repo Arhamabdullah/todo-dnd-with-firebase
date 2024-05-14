@@ -7,55 +7,42 @@ import InputField from '../components/inputfield';
 import Todos from '../components/todos';
 import { Status, Todo, TodosView, TodosStatus } from '../models/todo';
 import styles from '../styles/Home.module.css';
-import { setDoc, doc, addDoc, collection, deleteDoc, query, onSnapshot, QuerySnapshot } from 'firebase/firestore';
+import { collection, query, onSnapshot, QuerySnapshot } from 'firebase/firestore';
 import { db } from '../backend/firebase';
 
-// Import images
-import leftLogo from '../public/website_logo.png';
-import rightLogo from '../public/O_LOGO.png';
-
 const Home: NextPage = () => {
-  // State variables for todo management
   const [name, setName] = useState<string>('');
   const [view, setView] = useState<TodosView>(TodosView.KanbanView);
   const [backlogTodos, setBacklogTodos] = useState<Todo[]>([]);
   const [activeTodos, setActiveTodos] = useState<Todo[]>([]);
   const [completedTodos, setCompletedTodos] = useState<Todo[]>([]);
 
-  // Fetches todos from local storage on component mount
   useEffect(() => {
-    let backlogTodos = window.localStorage.getItem('backlogTodos');
-    if (backlogTodos) {
-      let parsed = JSON.parse(backlogTodos);
-      setBacklogTodos(parsed);
-    }
-    let activeTodos = window.localStorage.getItem('activeTodos');
-    if (activeTodos) {
-      let parsed = JSON.parse(activeTodos);
-      setActiveTodos(parsed);
-    }
-    let completedTodos = window.localStorage.getItem('completedTodos');
-    if (completedTodos) {
-      let parsed = JSON.parse(completedTodos);
-      setCompletedTodos(parsed);
-    }
+    const fetchTodos = async () => {
+      const q = query(collection(db, 'todos'));
+      const unsubscribe = onSnapshot(q, (snapshot: QuerySnapshot) => {
+        const todosArr: Todo[] = [];
+        snapshot.forEach((doc) => {
+          const todoData = doc.data() as Todo;
+          todosArr.push({ ...todoData, id: doc.id });
+        });
+        setBacklogTodos(todosArr);
+      });
+      return () => unsubscribe();
+    };
+    fetchTodos();
   }, []);
 
-  // Handles adding a new todo
   const addNewTodo = async (e: React.FormEvent) => {
     e.preventDefault();
     if (name) {
-      const newTodo = {
-        id: Date.now(),
+      const newTodo: Todo = {
+        id: Date.now().toString(),
         todoname: name,
         status: Status.Backlog,
-        isDone: false
+        isDone: false,
       };
-
-      setBacklogTodos([...backlogTodos, newTodo]);
-
       try {
-        // Add new todo to Firestore
         const docRef = collection(db, 'todos');
         await addDoc(docRef, newTodo);
         setBacklogTodos([...backlogTodos, newTodo]);
@@ -66,71 +53,31 @@ const Home: NextPage = () => {
     }
   };
 
-  // Fetches todos from Firestore in real-time
-  useEffect(() => {
-    const q = query(collection(db, 'todos'));
-    const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
-      let todosArr: Todo[] = [];
-      QuerySnapshot.forEach((doc) => {
-        todosArr.push({ ...doc.data(), id: doc.id });
-      });
-      setBacklogTodos(todosArr);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  // Handles drag and drop functionality for todos
   const onDragEndHandler = (result: DropResult) => {
     const { destination, source } = result;
-
-    if (!destination || (destination.droppableId === source.droppableId
-      && destination.index === source.index)) return;
-
-    let add,
-      backlog = backlogTodos.slice(), // Create copies to avoid mutation
-      active = activeTodos.slice(),
-      complete = completedTodos.slice();
+    if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) return;
+    const moveTodo = (sourceId: TodosStatus, destId: TodosStatus) => {
+      const sourceTodos = sourceId === TodosStatus.BacklogTodos ? backlogTodos : sourceId === TodosStatus.ActiveTodos ? activeTodos : completedTodos;
+      const destTodos = destId === TodosStatus.BacklogTodos ? backlogTodos : destId === TodosStatus.ActiveTodos ? activeTodos : completedTodos;
+      const [removed] = sourceTodos.splice(source.index, 1);
+      destTodos.splice(destination.index, 0, removed);
+      setBacklogTodos([...backlogTodos]);
+      setActiveTodos([...activeTodos]);
+      setCompletedTodos([...completedTodos]);
+    };
     switch (source.droppableId) {
       case TodosStatus.BacklogTodos:
-        add = backlogTodos[source.index];
-        backlog.splice(source.index, 1);
+        moveTodo(TodosStatus.BacklogTodos, destination.droppableId as TodosStatus);
         break;
       case TodosStatus.ActiveTodos:
-        add = active[source.index];
-        active.splice(source.index, 1);
+        moveTodo(TodosStatus.ActiveTodos, destination.droppableId as TodosStatus);
         break;
       case TodosStatus.CompletedTodos:
-        add = complete[source.index];
-        complete.splice(source.index, 1);
+        moveTodo(TodosStatus.CompletedTodos, destination.droppableId as TodosStatus);
         break;
-    }
-
-    if (add) {
-      switch (destination.droppableId) {
-        case TodosStatus.BacklogTodos:
-          backlog.splice(destination.index, 0, add);
-          break;
-        case TodosStatus.ActiveTodos:
-          active.splice(destination.index, 0, add);
-          break;
-        case TodosStatus.CompletedTodos:
-          complete.splice(destination.index, 0, add);
-          break;
-      }
-    }
-
-    setBacklogTodos(backlog);
-    setActiveTodos(active);
-    setCompletedTodos(complete);
-
-    if (window) {
-      window.localStorage.setItem('backlogTodos', JSON.stringify(backlog));
-      window.localStorage.setItem('activeTodos', JSON.stringify(active));
-      window.localStorage.setItem('completedTodos', JSON.stringify(complete));
     }
   };
 
-  // Renders the UI components
   return (
     <DragDropContext onDragEnd={onDragEndHandler}>
       <div className={styles.container}>
@@ -141,22 +88,21 @@ const Home: NextPage = () => {
         </Head>
         <header className="flex justify-between items-center px-4 py-2">
           <div className="flex items-center">
-            <Image src='../public/website_logo.png' alt="Left Logo" width={50} height={50} />
+            <Image src="/website_logo.png" alt="Left Logo" width={50} height={50} />
             <h2 className="ml-2 text-4xl font-bold">To-do</h2>
           </div>
           <div>
-            <Image src='../public/O_LOGO.png' alt="Right Logo" width={50} height={50} />
+            <Image src="/O_LOGO.png" alt="Right Logo" width={50} height={50} />
           </div>
         </header>
         <div className="flex flex-col items-center min-h-screen pt-10">
-          {/* Input field for adding new todo */}
           <InputField
-            value={name} // Current value of the "name" state variable
-            onChange={(e) => { setName(e.target.value) }} // Updates "name" state on input change
-            onSubmit={addNewTodo} // Triggers submission logic in "addNewTodo" function (if defined in InputField)
-            placeholder="Add a new todo" // Placeholder text for the input field
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onSubmit={addNewTodo}
+            placeholder="Add a new todo"
           />
-          {/* You can add more content here */}
+          {/* Additional content goes here */}
         </div>
         <Todos
           view={view}
@@ -170,11 +116,6 @@ const Home: NextPage = () => {
       </div>
     </DragDropContext>
   );
-};
-
-Home.getInitialProps = async () => {
-  console.log('req, ')
-  return {}
 };
 
 export default Home;
