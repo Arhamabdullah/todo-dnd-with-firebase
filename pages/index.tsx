@@ -12,7 +12,6 @@ import { db } from '../backend/firebase';
 
 const Home: NextPage = () => {
   const [name, setName] = useState<string>('');
-  const [view, setView] = useState<TodosView>(TodosView.KanbanView);
   const [backlogTodos, setBacklogTodos] = useState<Todo[]>([]);
   const [activeTodos, setActiveTodos] = useState<Todo[]>([]);
   const [completedTodos, setCompletedTodos] = useState<Todo[]>([]);
@@ -23,8 +22,14 @@ const Home: NextPage = () => {
       const unsubscribe = onSnapshot(q, (snapshot: QuerySnapshot) => {
         const todosArr: Todo[] = [];
         snapshot.forEach((doc) => {
-          const todoData = doc.data() as Todo; // Ensure that 'Todo' type matches the structure of your Firestore document
-          todosArr.push({ ...todoData, id: doc.id });
+          const todoData = doc.data();
+          const todo: Todo = {
+            id: doc.id,
+            todoname: todoData.todoname, // Adjust property names based on your Firestore document structure
+            status: todoData.status,
+            isDone: todoData.isDone,
+          };
+          todosArr.push(todo);
         });
         setBacklogTodos(todosArr);
       });
@@ -78,7 +83,7 @@ const Home: NextPage = () => {
     }
 };
 
-  return (
+ return (
     <DragDropContext onDragEnd={onDragEndHandler}>
       <div className={styles.container}>
         <Head>
@@ -105,7 +110,6 @@ const Home: NextPage = () => {
           {/* Additional content goes here */}
         </div>
         <Todos
-          view={view}
           backlogTodos={backlogTodos}
           setBacklogTodos={setBacklogTodos}
           activeTodos={activeTodos}
@@ -119,3 +123,4 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
