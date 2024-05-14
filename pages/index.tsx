@@ -3,7 +3,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
-import InputField from '../components/inputfield'
+import InputField from '../components/inputfield' // Potential error might be here
 import Todos from '../components/todos'
 import { Status, Todo, TodosView, TodosStatus } from '../models/todo'
 import styles from '../styles/Home.module.css'
@@ -12,7 +12,8 @@ import { db } from '../backend/firebase'
 
 const Home: NextPage = () => {
   const [name, setName] = useState<string>('')
-  const [view, setView] = useState<TodosView>(TodosView.KanbanView)
+  // Corrected line with semicolon
+  const [view, setView] = useState<TodosView>(TodosView.KanbanView);
   const [backlogTodos, setBacklogTodos] = useState<Todo[]>([])
   const [activeTodos, setActiveTodos] = useState<Todo[]>([])
   const [completedTodos, setCompletedTodos] = useState<Todo[]>([])
@@ -121,7 +122,7 @@ const Home: NextPage = () => {
     }
   }
 
-  return (
+ return (
     <DragDropContext onDragEnd={onDragEndHandler}>
       <div className={styles.container}>
         <Head>
@@ -131,12 +132,9 @@ const Home: NextPage = () => {
         </Head>
         <header className="flex justify-between items-center px-4 py-2">
           <div className="flex items-center">
-{/*             <Image src="/website_logo.png" alt="Left Logo" width={50} height={50} /> */}
-            <h2 className="ml-2 text-4xl font-bold">To-do</h2>
+            {/* ... header content */}
           </div>
-{/*           <div>
-            <Image src="/O_LOGO.png" alt="Right Logo" width={50} height={50} />
-          </div> */}
+          {/* ... header content */}
         </header>
         <div className="flex flex-col items-center min-h-screen pt-10">
           <InputField
